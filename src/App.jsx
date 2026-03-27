@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import FlyingPlane from "./components/FlyingPlane";
+import FlyingFoodItem from "./components/FlyingFoodItem";
 import Header from "./components/Header";
 import Meals from "./components/Meals";
 import CartContextProvider from "./store/GlobalContext";
@@ -100,7 +100,7 @@ function App() {
       <Meals onAddToCartAnimation={launchPlane}></Meals>
       <div className="flight-overlay" aria-hidden="true">
         {flights.map((flight) => (
-          <FlyingPlane key={flight.id} {...flight} />
+          <FlyingFoodItem key={flight.id} {...flight} />
         ))}
       </div>
       {cartNotification && (

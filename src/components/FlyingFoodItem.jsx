@@ -1,4 +1,4 @@
-export default function FlyingPlane({
+export default function FlyingFoodItem({
   startX,
   startY,
   deltaX,
