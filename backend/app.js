@@ -4,6 +4,10 @@ import bodyParser from 'body-parser';
 import express from 'express';
 
 const app = express();
+const ECB_DAILY_RATES_URL =
+  'https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml';
+const EXCHANGE_RATE_CACHE_MS = 60 * 60 * 1000;
+let cachedExchangeRates = null;
 
 app.use(bodyParser.json());
 app.use(express.static('public'));
@@ -15,9 +19,60 @@ app.use((req, res, next) => {
   next();
 });
 
+async function getExchangeRates() {
+  if (
+    cachedExchangeRates &&
+    Date.now() - cachedExchangeRates.fetchedAt < EXCHANGE_RATE_CACHE_MS
+  ) {
+    return cachedExchangeRates.data;
+  }
+
+  const response = await fetch(ECB_DAILY_RATES_URL);
+
+  if (!response.ok) {
+    throw new Error('Could not fetch ECB exchange rates.');
+  }
+
+  const xml = await response.text();
+  const dateMatch = xml.match(/time=['"](\d{4}-\d{2}-\d{2})['"]/);
+  const rateEntries = [...xml.matchAll(/currency=['"]([A-Z]{3})['"]\s+rate=['"]([\d.]+)['"]/g)];
+
+  if (!dateMatch || rateEntries.length === 0) {
+    throw new Error('Could not parse ECB exchange rates.');
+  }
+
+  const rates = { EUR: 1 };
+
+  for (const [, currencyCode, rate] of rateEntries) {
+    rates[currencyCode] = Number(rate);
+  }
+
+  const exchangeRateData = {
+    baseCurrency: 'EUR',
+    date: dateMatch[1],
+    rates,
+  };
+
+  cachedExchangeRates = {
+    data: exchangeRateData,
+    fetchedAt: Date.now(),
+  };
+
+  return exchangeRateData;
+}
+
 app.get('/meals', async (req, res) => {
   const meals = await fs.readFile('./data/available-meals.json', 'utf8');
   res.json(JSON.parse(meals));
+});
+
+app.get('/exchange-rates', async (req, res) => {
+  try {
+    const exchangeRateData = await getExchangeRates();
+    res.json(exchangeRateData);
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Could not load exchange rates.' });
+  }
 });
 
 app.post('/orders', async (req, res) => {

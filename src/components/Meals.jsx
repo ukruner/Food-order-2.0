@@ -6,7 +6,7 @@ import useHttp from "../hooks/useHttp";
 const requestConfig = {};
 
 export default function Meals({ onAddToCartAnimation }) {
-  const { mealsList, currency, addToCart } = useContext(shopCart);
+  const { mealsList, addToCart, formatPrice } = useContext(shopCart);
   const { error, isLoading } = useHttp(
     "http://localhost:3000/meals",
     requestConfig
@@ -37,10 +37,7 @@ export default function Meals({ onAddToCartAnimation }) {
                 <img src={`http://localhost:3000/${item.image}`}></img>
                 <h3>{item.name}</h3>
                 <div>
-                  <p className="meal-item-price">
-                    {currency}
-                    {item.price}
-                  </p>
+                  <p className="meal-item-price">{formatPrice(item.price)}</p>
                 </div>
                 <p className="meal-item-description">{item.description}</p>
                 <div className="meal-item-actions">

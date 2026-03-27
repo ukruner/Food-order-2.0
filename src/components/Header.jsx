@@ -4,6 +4,13 @@ import Modal from "./Modal";
 import { useContext } from "react";
 import { shopCart } from "../store/GlobalContext";
 
+const CURRENCY_LABELS = {
+  GBP: "GBP(£)",
+  USD: "USD($)",
+  EUR: "EUR(€)",
+  JPY: "JPY(¥)",
+};
+
 export default function Header({ cartButtonRef }) {
   const dialog = useRef();
 
@@ -12,6 +19,7 @@ export default function Header({ cartButtonRef }) {
     currency,
     currencyArray,
     setCurrency,
+    isFetchingExchangeRates,
   } = useContext(shopCart);
 
   function openModal() {
@@ -43,10 +51,11 @@ export default function Header({ cartButtonRef }) {
               id="currency"
               value={currency}
               onChange={handleSetCurrency}
+              disabled={isFetchingExchangeRates}
             >
               {currencyArray.map((element) => (
                 <option key={element} id="currency" value={element}>
-                  {element}
+                  {CURRENCY_LABELS[element] ?? element}
                 </option>
               ))}
             </select>

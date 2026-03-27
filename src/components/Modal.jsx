@@ -4,6 +4,7 @@ import {
   useContext,
   forwardRef,
   useState,
+  useEffect,
 } from "react";
 import { createPortal } from "react-dom";
 import Cart from "./Cart.jsx";
@@ -14,6 +15,7 @@ import { shopCart } from "../store/GlobalContext.jsx";
 const Modal = forwardRef(function reuseModal({}, ref) {
   const dialog = useRef();
   const finalDialog = useRef();
+  const reopenTimeout = useRef();
   const { shoppingDone, setShoppingDone, cartItems, mealsList } =
     useContext(shopCart);
   const [submittedItems, setSubmittedItems] = useState([]);
@@ -25,6 +27,14 @@ const Modal = forwardRef(function reuseModal({}, ref) {
       },
     };
   });
+
+  useEffect(() => {
+    return () => {
+      if (reopenTimeout.current) {
+        window.clearTimeout(reopenTimeout.current);
+      }
+    };
+  }, []);
 
   function orderSent() {
     setSubmittedItems(
@@ -48,7 +58,12 @@ const Modal = forwardRef(function reuseModal({}, ref) {
   function checkoutOpen() {
     dialog.current.close();
     setShoppingDone(true);
-    setTimeout(() => dialog.current.showModal(), 300);
+    reopenTimeout.current = window.setTimeout(() => {
+      if (dialog.current) {
+        dialog.current.showModal();
+      }
+      reopenTimeout.current = null;
+    }, 300);
   }
 
   function wrapShopState() {

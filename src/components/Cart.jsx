@@ -4,7 +4,8 @@ import { shopCart } from "../store/GlobalContext";
 import { useContext } from "react";
 
 export default function Cart({ checkoutOpen, modalRef }) {
-  const { cartItems = [], total, updateCart, currency } = useContext(shopCart);
+  const { cartItems = [], total, updateCart, formatPrice } =
+    useContext(shopCart);
 
   return (
     <div className="cart">
@@ -18,8 +19,7 @@ export default function Cart({ checkoutOpen, modalRef }) {
           return (
             <li key={item.id} className="cart-item">
               <p>
-                {item.name} = {currency}
-                {item.price} x {item.quantity}
+                {item.name} = {formatPrice(item.price)} x {item.quantity}
               </p>
               <div className="cart-item-actions">
                 <Button onClick={() => updateCart(item.id, -1)}>-</Button>
@@ -30,7 +30,7 @@ export default function Cart({ checkoutOpen, modalRef }) {
           );
         })}
       </ul>
-      <div className="cart-total">{total > 0 && currency+total}</div>
+      <div className="cart-total">{total > 0 && formatPrice(total)}</div>
       <div className="modal-actions">
         <Button
           className="text-button"

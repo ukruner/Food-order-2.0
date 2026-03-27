@@ -10,14 +10,21 @@ const reqOptions = {
 };
 
 export default function CheckOut({ orderSent, wrapShopState, modalRef }) {
-  const { order, currency, dataClearing } = useContext(shopCart);
+  const { order, currency, dataClearing, formatPrice } = useContext(shopCart);
   const { isLoading: isSending, error, sendRequest } = useHttp("http://localhost:3000/orders", reqOptions)
   async function handleSubmit(event) {
     event.preventDefault();
     const fd = new FormData(event.target);
     const arrayData = fd.entries();
     const objData = Object.fromEntries(arrayData);
-    const fullOrder = { order: { ...order.order, total: currency+order.order.total, customer: objData } };
+    const fullOrder = {
+      order: {
+        ...order.order,
+        total: formatPrice(order.order.total),
+        currency,
+        customer: objData,
+      },
+    };
 
     sendRequest(JSON.stringify(fullOrder));
 
@@ -66,7 +73,7 @@ export default function CheckOut({ orderSent, wrapShopState, modalRef }) {
   return (
     <>
       <h2>Checkout</h2>
-      <p>Total amount: {order.order.total ? currency+order.order.total : "TBC"}</p>
+      <p>Total amount: {order.order.total ? formatPrice(order.order.total) : "TBC"}</p>
 
       <form id="form" type="form" onSubmit={handleSubmit}>
         <Input className="control" id="name" type="text" name="name" required>
