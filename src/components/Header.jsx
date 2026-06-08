@@ -3,6 +3,7 @@ import Button from "./Button";
 import Modal from "./Modal";
 import { useContext } from "react";
 import { shopCart } from "../store/GlobalContext";
+import { assetUrl } from "../config/runtime";
 
 const CURRENCY_LABELS = {
   GBP: "GBP(£)",
@@ -35,7 +36,7 @@ export default function Header({ cartButtonRef }) {
     <div id="main-header">
       <Modal ref={dialog} title="shopping cart"></Modal>
       <div id="title">
-        <img src={"/logo.jpg"}></img>
+        <img src={assetUrl("/logo.jpg")} alt="React Food Order logo"></img>
         <h1>REACT FOOD ORDER</h1>
       </div>
       <div id="headerbuttons">
