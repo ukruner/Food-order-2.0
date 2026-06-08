@@ -2,6 +2,10 @@ import { useState, useEffect, useCallback, useContext } from "react";
 import { shopCart } from "../store/GlobalContext";
 
 async function sendHttpRequest(url, config) {
+  if (!url) {
+    return { message: "Static demo request skipped." };
+  }
+
   const response = await fetch(url, config);
 
   const responseData = await response.json();
@@ -25,7 +29,7 @@ export default function useHttp(url, config) {
     setIsLoading(true);
     try {
       const resData = await sendHttpRequest(url, {...config, body: data});
-    if (!data){
+    if (!data && resData){
     setMealsList(resData);
     }
     } catch (error) {
@@ -36,7 +40,7 @@ export default function useHttp(url, config) {
   }, [url, config] );
 
   useEffect(()=>{
-    if ((config && (config.method === "GET" || !config.method)) || !config){
+    if (url && ((config && (config.method === "GET" || !config.method)) || !config)){
     sendRequest()}
 
   }, [sendRequest, config]);

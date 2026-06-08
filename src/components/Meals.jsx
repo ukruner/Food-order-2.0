@@ -2,13 +2,14 @@ import React, { useContext } from "react";
 import Button from "./Button";
 import { shopCart } from "../store/GlobalContext";
 import useHttp from "../hooks/useHttp";
+import { apiUrl, assetUrl, IS_STATIC_HOST } from "../config/runtime";
 
 const requestConfig = {};
 
 export default function Meals({ onAddToCartAnimation }) {
   const { mealsList, addToCart, formatPrice } = useContext(shopCart);
   const { error, isLoading } = useHttp(
-    "http://localhost:3000/meals",
+    IS_STATIC_HOST ? apiUrl("/data/available-meals.json") : apiUrl("/meals"),
     requestConfig
   );
 
@@ -16,7 +17,7 @@ export default function Meals({ onAddToCartAnimation }) {
     onAddToCartAnimation?.(
       event.currentTarget.getBoundingClientRect(),
       item.name,
-      `http://localhost:3000/${item.image}`
+      assetUrl(item.image)
     );
     addToCart(item);
   }
@@ -34,7 +35,7 @@ export default function Meals({ onAddToCartAnimation }) {
           return (
             <li className="meal-item" key={item.id}>
               <article>
-                <img src={`http://localhost:3000/${item.image}`}></img>
+                <img src={assetUrl(item.image)}></img>
                 <h3>{item.name}</h3>
                 <div>
                   <p className="meal-item-price">{formatPrice(item.price)}</p>

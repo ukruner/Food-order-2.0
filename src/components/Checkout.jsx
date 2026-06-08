@@ -3,6 +3,7 @@ import Input from "./Input";
 import Button from "./Button";
 import { shopCart } from "../store/GlobalContext";
 import useHttp from "../hooks/useHttp";
+import { apiUrl, IS_STATIC_HOST } from "../config/runtime";
 
 const reqOptions = {
   method: "POST",
@@ -11,7 +12,10 @@ const reqOptions = {
 
 export default function CheckOut({ orderSent, wrapShopState, modalRef }) {
   const { order, currency, dataClearing, formatPrice } = useContext(shopCart);
-  const { isLoading: isSending, error, sendRequest } = useHttp("http://localhost:3000/orders", reqOptions)
+  const { isLoading: isSending, error, sendRequest } = useHttp(
+    IS_STATIC_HOST ? null : apiUrl("/orders"),
+    reqOptions
+  );
   async function handleSubmit(event) {
     event.preventDefault();
     const fd = new FormData(event.target);
@@ -26,9 +30,7 @@ export default function CheckOut({ orderSent, wrapShopState, modalRef }) {
       },
     };
 
-    sendRequest(JSON.stringify(fullOrder));
-
-   
+    await sendRequest(JSON.stringify(fullOrder));
 
     wrapShopState();
     orderSent();

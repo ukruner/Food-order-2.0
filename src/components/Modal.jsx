@@ -11,6 +11,7 @@ import Cart from "./Cart.jsx";
 import Checkout from "./Checkout.jsx";
 import Button from "./Button.jsx";
 import { shopCart } from "../store/GlobalContext.jsx";
+import { assetUrl } from "../config/runtime.js";
 
 const Modal = forwardRef(function reuseModal({}, ref) {
   const dialog = useRef();
@@ -44,7 +45,7 @@ const Modal = forwardRef(function reuseModal({}, ref) {
         return {
           id: item.id,
           name: item.name,
-          image: meal ? `http://localhost:3000/${meal.image}` : "",
+          image: meal ? assetUrl(meal.image) : "",
         };
       })
     );

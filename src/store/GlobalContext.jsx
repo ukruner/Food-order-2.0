@@ -1,4 +1,5 @@
 import { createContext, useReducer, useState, useEffect } from "react";
+import { apiUrl, IS_STATIC_HOST } from "../config/runtime";
 
 const CURRENCY_CONFIG = {
   GBP: { symbol: "£", locale: "en-GB" },
@@ -46,10 +47,17 @@ export default function CartContextProvider({ children }) {
     let isActive = true;
 
     async function fetchExchangeRates() {
+      if (IS_STATIC_HOST) {
+        setExchangeRates({ EUR: 1.17, GBP: 1, USD: 1.33, JPY: 203 });
+        setExchangeRateDate("static demo rates");
+        setExchangeRatesError(null);
+        return;
+      }
+
       setIsFetchingExchangeRates(true);
 
       try {
-        const response = await fetch("http://localhost:3000/exchange-rates");
+        const response = await fetch(apiUrl("/exchange-rates"));
         const responseData = await response.json();
 
         if (!response.ok) {
